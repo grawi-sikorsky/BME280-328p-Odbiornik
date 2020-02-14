@@ -24,6 +24,9 @@ void loop()
     uint8_t buflen = sizeof(data);
 if (vw_have_message())  // Is there a packet for us? 
   {
+    digitalWrite(13,HIGH);
+    delay(1000);
+    digitalWrite(13,LOW);
     vw_get_message(buf, &buflen);
     memcpy(&data,&buf,buflen);
     Serial.print("\nPackage:");

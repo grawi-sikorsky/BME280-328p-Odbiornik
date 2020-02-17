@@ -1,9 +1,7 @@
 #include <RH_ASK.h>
 #include <SPI.h> // Not actualy used but needed to compile
-
 #include <avr/power.h>
 
-//RH_ASK rf_receiver;
 RH_ASK rf_receiver(2000,11,12,3,true);
 
 void setup()
@@ -23,15 +21,15 @@ void setup()
 
 void loop()
 {
-    uint8_t buf[11];
+    uint8_t buf[2];
     uint8_t buflen = sizeof(buf);
     if (rf_receiver.recv(buf, &buflen)) // Non-blocking
     {
       // Message with a good checksum received, dump it.
       digitalWrite(13,HIGH);
+      delay(50);
       Serial.print("Message: ");
       Serial.println((char*)buf);
-      delay(20);
       digitalWrite(13,LOW);
     }
 }

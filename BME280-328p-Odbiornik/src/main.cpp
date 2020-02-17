@@ -1,37 +1,30 @@
-#include <VirtualWire.h>
+#include <RH_ASK.h>
+#include <SPI.h> // Not actualy used but needed to compile
 
-const int receive_pin = 12;
-char temperatureChar[10];
-char humidityChar[10];
-struct package
-{
-  float temperature = 0.0;
-  float humidity = 0.0;
-};
-typedef struct package Package;
-Package data;
+RH_ASK rf_receiver;
+
 void setup()
 {
-    delay(1000);
-    // Initialise the IO and ISR
-    vw_set_rx_pin(receive_pin);
-    vw_setup(500);   // Bits per sec
-    vw_rx_start();       // Start the receiver PLL running
+    Serial.begin(9600);	// Debugging only
+    if (!rf_receiver.init())
+    {
+      Serial.println("init failed");
+    }
+    else
+    {
+      Serial.println("init ok");
+    }
 }
+
 void loop()
 {
-    uint8_t buf[sizeof(data)];
-    uint8_t buflen = sizeof(data);
-if (vw_have_message())  // Is there a packet for us? 
-  {
-    digitalWrite(13,HIGH);
-    delay(1000);
-    digitalWrite(13,LOW);
-    vw_get_message(buf, &buflen);
-    memcpy(&data,&buf,buflen);
-    Serial.print("\nPackage:");
-    Serial.print(data.temperature);
-    Serial.print("\n");
-    Serial.println(data.humidity);
-  }
+    uint8_t buf[12];
+    uint8_t buflen = sizeof(buf);
+    if (rf_receiver.recv(buf, &buflen)) // Non-blocking
+    {
+      int i;
+      // Message with a good checksum received, dump it.
+      Serial.print("Message: ");
+      Serial.println((char*)buf);         
+    }
 }

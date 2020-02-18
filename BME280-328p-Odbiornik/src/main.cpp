@@ -1,6 +1,8 @@
 #include <RH_ASK.h>
 #include <SPI.h> // Not actualy used but needed to compile
+#include <Wire.h>
 #include <Adafruit_INA219.h>
+#include <time.h>
 
 Adafruit_INA219 ina219;
   float shuntvoltage = 0;
@@ -8,6 +10,10 @@ Adafruit_INA219 ina219;
   float current_mA = 0;
   float loadvoltage = 0;
   float power_mW = 0;
+
+int reading, reading_avg;
+float mA_IOT,mA_100,mA_avg;
+float current_time, last_time;
 
 RH_ASK rf_receiver(2000,11,12,3,true);
 
@@ -29,37 +35,55 @@ void setup()
     // By default the initialization will use the largest range (32V, 2A).  However
     // you can call a setCalibration function to change this range (see comments).
     ina219.begin();
+    
     // To use a slightly lower 32V, 1A range (higher precision on amps):
     //ina219.setCalibration_32V_1A();
     // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-    //ina219.setCalibration_16V_400mA();
+    ina219.setCalibration_16V_400mA();
+}
+void pomiar_mA()
+{
+  mA_IOT += ina219.getCurrent_mA();
+  reading++;
+
+  if(reading >= 100)
+  {
+    reading_avg++;
+
+    mA_100 = mA_IOT/100;
+
+    mA_avg += mA_100;
+    float tmp;
+    tmp = mA_avg/reading_avg;
+
+    Serial.print("Current / 100 : "); Serial.println(mA_100);
+    Serial.print("Current / avg : "); Serial.println(tmp);
+    mA_100 = mA_IOT = 0;
+    reading = 0;
+  }
 }
 
 void loop()
 {
-    uint8_t buf[2];
-    uint8_t buflen = sizeof(buf);
-    if (rf_receiver.recv(buf, &buflen)) // Non-blocking
-    {
-      // Message with a good checksum received, dump it.
-      digitalWrite(13,HIGH);
-      delay(50);
-      Serial.print("Message: ");
-      Serial.println((char*)buf);
-      digitalWrite(13,LOW);
-    }
+  current_time = millis();
+  uint8_t buf[2];
+  uint8_t buflen = sizeof(buf);
+  if (rf_receiver.recv(buf, &buflen)) // Non-blocking
+  {
+    // Message with a good checksum received, dump it.
+    digitalWrite(13,HIGH);
+    delay(5);
+    Serial.print("Message: ");
+    Serial.println((char*)buf);
+    digitalWrite(13,LOW);
+  }
 
+  pomiar_mA();
 
-    shuntvoltage = ina219.getShuntVoltage_mV();
-    busvoltage = ina219.getBusVoltage_V();
-    current_mA = ina219.getCurrent_mA();
-    power_mW = ina219.getPower_mW();
-    loadvoltage = busvoltage + (shuntvoltage / 1000);
-    Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
-    Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
-    Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
-    Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-    Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
-    Serial.println("");
-    delay(500);
+  current_mA = ina219.getCurrent_mA();
+
+  //Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
+  //Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
+  //Serial.println("");
+  delay(25);
 }

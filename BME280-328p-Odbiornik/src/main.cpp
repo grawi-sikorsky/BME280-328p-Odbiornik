@@ -57,7 +57,7 @@ void pomiar_mA()
     tmp = mA_avg/reading_avg;
 
     Serial.print("Current / 100 : "); Serial.println(mA_100);
-    Serial.print("Current / avg : "); Serial.println(tmp);
+    Serial.print("Current / avg : "); Serial.println(tmp); Serial.println();
     mA_100 = mA_IOT = 0;
     reading = 0;
   }
@@ -65,7 +65,6 @@ void pomiar_mA()
 
 void loop()
 {
-  current_time = millis();
   uint8_t buf[2];
   uint8_t buflen = sizeof(buf);
   if (rf_receiver.recv(buf, &buflen)) // Non-blocking
@@ -80,10 +79,10 @@ void loop()
 
   pomiar_mA();
 
-  current_mA = ina219.getCurrent_mA();
+  //current_mA = ina219.getCurrent_mA();
 
   //Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
   //Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
   //Serial.println("");
-  delay(25);
+  delay(10);
 }

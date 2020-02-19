@@ -77,6 +77,7 @@ void loop()
     digitalWrite(13,LOW);
   }
 
+  delay(10);
   pomiar_mA();
 
   //current_mA = ina219.getCurrent_mA();
@@ -84,5 +85,5 @@ void loop()
   //Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
   //Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
   //Serial.println("");
-  delay(10);
+  
 }

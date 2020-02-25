@@ -4,6 +4,21 @@
 #include <Adafruit_INA219.h>
 #include <time.h>
 
+//Nadawanie 
+u8 TxTbl[40];
+volatile u8 BitCnt = 0;
+volatile u8 BitNr = 0;
+volatile u8 HalfBit = 0;
+volatile u8 Tx_state;
+volatile u8 TxRepeatCnt = 0;
+
+u8 Prefix = 0xA5;
+//at 0x8400 const code u8 TblAdr[2] = {0, 0};
+u8 AdrMsb;
+u8 AdrLsb;
+u8 Cmd = 0xA1;	
+u8 Checksum = 0;
+
 Adafruit_INA219 ina219;
   float shuntvoltage = 0;
   float busvoltage = 0;
@@ -63,9 +78,70 @@ void pomiar_mA()
   }
 }
 
+void Make_TxTbl(void)
+{
+	u8 i;
+	u8 idx = 0;
+	
+	i=0;
+	while(i < 8)
+		{
+			if((Prefix & (0x80 >> i)) == (0x80 >> i))
+				TxTbl[idx] = 1;
+			else
+				TxTbl[idx] = 0;
+		i++;
+		idx++;	
+		}
+	
+	i=0;
+	while(i < 8)
+		{
+			if((AdrMsb & (0x80 >> i)) == (0x80 >> i))
+				TxTbl[idx] = 1;
+			else
+				TxTbl[idx] = 0;
+		i++;
+		idx++;	
+		}
+		
+	i=0;
+	while(i < 8)
+		{
+			if((AdrLsb & (0x80 >> i)) == (0x80 >> i))
+				TxTbl[idx] = 1;
+			else
+				TxTbl[idx] = 0;
+		i++;
+		idx++;	
+		}	
+		
+	i=0;
+	while(i < 8)
+		{
+			if((Cmd & (0x80 >> i)) == (0x80 >> i))
+				TxTbl[idx] = 1;
+			else
+				TxTbl[idx] = 0;
+		i++;
+		idx++;	
+		}	
+		
+	i=0;
+	while(i < 8)
+		{
+			if((Checksum & (0x80 >> i)) == (0x80 >> i))
+				TxTbl[idx] = 1;
+			else
+				TxTbl[idx] = 0;
+		i++;
+		idx++;	
+		}	
+}
+
 void loop()
 {
-  uint8_t buf[2];
+  uint8_t buf[40];
   uint8_t buflen = sizeof(buf);
   if (rf_receiver.recv(buf, &buflen)) // Non-blocking
   {
@@ -77,13 +153,18 @@ void loop()
     digitalWrite(13,LOW);
   }
 
-  delay(10);
+  delay(150);
   pomiar_mA();
 
-  //current_mA = ina219.getCurrent_mA();
+  current_mA = ina219.getCurrent_mA();
+  Serial.print(" "); Serial.print(current_mA); Serial.println(" mA");  
+  
+  //Make_TxTbl();
+  //for(int i=0;i<40;i++){
+  //  Serial.print(TxTbl[i]);
+  //}
+  //Serial.println();
 
-  //Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-  //Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
   //Serial.println("");
   
 }

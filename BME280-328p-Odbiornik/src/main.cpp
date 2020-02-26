@@ -30,7 +30,7 @@ int reading, reading_avg;
 float mA_IOT,mA_100,mA_avg;
 float current_time, last_time;
 
-RH_ASK rf_receiver(2000,11,12,3,true);
+RH_ASK rf_receiver(6250,11,12,3,true);
 
 void setup()
 {
@@ -141,7 +141,7 @@ void Make_TxTbl(void)
 
 void loop()
 {
-  uint8_t buf[40];
+  uint8_t buf[41];
   uint8_t buflen = sizeof(buf);
   if (rf_receiver.recv(buf, &buflen)) // Non-blocking
   {
@@ -153,16 +153,11 @@ void loop()
     digitalWrite(13,LOW);
   }
 
-  delay(150);
+  delay(5);
   pomiar_mA();
 
   current_mA = ina219.getCurrent_mA();
-  Serial.print(" "); Serial.print(current_mA); Serial.println(" mA");  
-  
-  //Make_TxTbl();
-  //for(int i=0;i<40;i++){
-  //  Serial.print(TxTbl[i]);
-  //}
+  Serial.print(" "); Serial.print(current_mA); Serial.println(" mA");
   //Serial.println();
 
   //Serial.println("");

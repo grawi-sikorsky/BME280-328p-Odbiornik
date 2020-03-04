@@ -72,88 +72,16 @@ void pomiar_mA()
     tmp = mA_avg/reading_avg;
 
     Serial.print("Current / 100 : "); Serial.println(mA_100);
-    Serial.print("Current / avg : "); Serial.println(tmp); Serial.println();
+    Serial.print("Current / avg : "); Serial.println(tmp); 
+    Serial.print("Int Loop : "); Serial.println(reading_avg); Serial.println();
     mA_100 = mA_IOT = 0;
     reading = 0;
   }
 }
 
-void Make_TxTbl(void)
-{
-	u8 i;
-	u8 idx = 0;
-	
-	i=0;
-	while(i < 8)
-		{
-			if((Prefix & (0x80 >> i)) == (0x80 >> i))
-				TxTbl[idx] = 1;
-			else
-				TxTbl[idx] = 0;
-		i++;
-		idx++;	
-		}
-	
-	i=0;
-	while(i < 8)
-		{
-			if((AdrMsb & (0x80 >> i)) == (0x80 >> i))
-				TxTbl[idx] = 1;
-			else
-				TxTbl[idx] = 0;
-		i++;
-		idx++;	
-		}
-		
-	i=0;
-	while(i < 8)
-		{
-			if((AdrLsb & (0x80 >> i)) == (0x80 >> i))
-				TxTbl[idx] = 1;
-			else
-				TxTbl[idx] = 0;
-		i++;
-		idx++;	
-		}	
-		
-	i=0;
-	while(i < 8)
-		{
-			if((Cmd & (0x80 >> i)) == (0x80 >> i))
-				TxTbl[idx] = 1;
-			else
-				TxTbl[idx] = 0;
-		i++;
-		idx++;	
-		}	
-		
-	i=0;
-	while(i < 8)
-		{
-			if((Checksum & (0x80 >> i)) == (0x80 >> i))
-				TxTbl[idx] = 1;
-			else
-				TxTbl[idx] = 0;
-		i++;
-		idx++;	
-		}	
-}
-
 void loop()
 {
-  uint8_t buf[41];
-  uint8_t buflen = sizeof(buf);
-  if (rf_receiver.recv(buf, &buflen)) // Non-blocking
-  {
-    // Message with a good checksum received, dump it.
-    digitalWrite(13,HIGH);
-    delay(5);
-    Serial.print("Message: ");
-    Serial.println((char*)buf);
-    digitalWrite(13,LOW);
-  }
-
-  delay(5);
+  //delay(1);
   pomiar_mA();
 
   current_mA = ina219.getCurrent_mA();

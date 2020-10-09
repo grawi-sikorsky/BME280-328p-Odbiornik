@@ -4,21 +4,6 @@
 #include <Adafruit_INA219.h>
 #include <time.h>
 
-//Nadawanie 
-u8 TxTbl[40];
-volatile u8 BitCnt = 0;
-volatile u8 BitNr = 0;
-volatile u8 HalfBit = 0;
-volatile u8 Tx_state;
-volatile u8 TxRepeatCnt = 0;
-
-u8 Prefix = 0xA5;
-//at 0x8400 const code u8 TblAdr[2] = {0, 0};
-u8 AdrMsb;
-u8 AdrLsb;
-u8 Cmd = 0xA1;	
-u8 Checksum = 0;
-
 Adafruit_INA219 ina219;
   float shuntvoltage = 0;
   float busvoltage = 0;
@@ -36,7 +21,7 @@ void setup()
 {
   //clock_prescale_set(clock_div_1);
   pinMode(13,OUTPUT);
-    Serial.begin(9600);	// Debugging only
+    Serial.begin(115200);	// Debugging only
     if (!rf_receiver.init())
     {
       Serial.println("init failed");
@@ -81,7 +66,7 @@ void pomiar_mA()
 
 void loop()
 {
-  //delay(1);
+  delay(25);
   pomiar_mA();
 
   current_mA = ina219.getCurrent_mA();

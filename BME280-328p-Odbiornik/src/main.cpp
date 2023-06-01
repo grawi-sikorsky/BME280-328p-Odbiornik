@@ -1,5 +1,5 @@
 #include <RH_ASK.h>
-#include <SPI.h> // Not actualy used but needed to compile
+//#include <SPI.h> // Not actualy used but needed to compile
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 #include <time.h>

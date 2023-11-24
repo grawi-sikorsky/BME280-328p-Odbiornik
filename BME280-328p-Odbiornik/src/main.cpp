@@ -66,7 +66,7 @@ void pomiar_mA()
 
 void loop()
 {
-  delay(25);
+  delay(20);
   pomiar_mA();
 
   current_mA = ina219.getCurrent_mA();
